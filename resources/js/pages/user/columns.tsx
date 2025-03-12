@@ -1,0 +1,141 @@
+import { ColumnDef } from "@tanstack/react-table"
+import { ArrowUpDown, Edit, MoreHorizontal, Trash } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { router } from '@inertiajs/react';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { useState } from 'react';
+import axios from 'axios';
+import { toast } from 'sonner';
+
+
+
+export type User = {
+    id: string
+    name: string
+    email: string
+}
+
+const editUser = (id: number) => {
+    router.visit(`/user/edit/${id}`);
+}
+
+const deleteUser = (id: number) => {
+    try {
+        axios.delete(`/user/delete/${id}`).then((response) => {
+            toast.success(response.data.message);
+            router.visit(`/user`);
+        }).catch((error) => {
+            toast.error("Kullanıcı silinemedi " + error);
+        });
+    } catch (error) {
+        if (error instanceof Error) {
+            toast.error("Bir hata oluştu " + error);
+        }
+    }
+}
+
+
+export const columns: ColumnDef<User>[] = [
+
+    {
+        accessorKey: "id",
+        // header: "id",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    ID
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+    },
+    {
+        accessorKey: "name",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Name
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+    },
+    {
+        accessorKey: "email",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Email
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+    },
+
+    {
+        header: "Action",
+        cell: ({ row }) => {
+            const [alertOpen, setAlertOpen] = useState(false);
+
+            return (
+                <div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild className={"dark:hover:bg-gray-700 hover:bg-gray-200 p-1 rounded-md"}>
+                            <MoreHorizontal></MoreHorizontal>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem className={"text-green-500"} onClick={() => editUser(Number(row.original.id))}>
+                                <Edit className={"text-green-500"}/>
+                                Düzenle
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className={"text-red-500"} onClick={() => setAlertOpen(true)}>
+                                <Trash className={"text-red-500"}/>
+                                Sil
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>{row.original.name} kullanıcısını silmek istediğinize emin misiniz? </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Bu işlem geri alınamaz!
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel onClick={() => setAlertOpen(false)}>İptal Et</AlertDialogCancel>
+                                <AlertDialogAction className={"bg-red-500 text-white hover:bg-red-600"} onClick={() => deleteUser(Number(row.original.id))}>Sil</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </div>
+            )
+        }
+
+    },
+]
