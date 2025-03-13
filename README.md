@@ -70,6 +70,10 @@ Columns ve datatable'yi farklı sayfalarda yapılma şekli de var sadece bir say
 
 ## Kullanım
 
+### Kullanıcılar
+
+- Kullanıcıları listeleyin, ekleyin, güncelleyin ve silin.
+
 ### Ürün Kategorileri
 
 - Ürün kategorilerini listeleyin, ekleyin, güncelleyin ve silin.
